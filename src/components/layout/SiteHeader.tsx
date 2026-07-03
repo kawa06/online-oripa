@@ -1,11 +1,18 @@
 ﻿import Link from "next/link";
+import { headers } from "next/headers";
 import { getSessionProfile } from "@/lib/auth";
 import { formatPoints } from "@/lib/utils";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { MobileNavBar } from "@/components/layout/MobileNavBar";
 
+const AUTH_ENTRY_PAGES = new Set(["/login", "/register", "/forgot-password"]);
+
 export async function SiteHeader() {
-  const profile = await getSessionProfile().catch(() => null);
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const profile = AUTH_ENTRY_PAGES.has(pathname)
+    ? null
+    : await getSessionProfile().catch(() => null);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur-md">

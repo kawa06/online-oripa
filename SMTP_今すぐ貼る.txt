@@ -1,0 +1,32 @@
+============================================
+ ORIPA VAULT — メール復旧（3分）
+ Token 不要・以前動いていた方式
+============================================
+
+SMTP を Save しても、Send Email Hook が ON だと {} エラーになります。
+Hook を Delete してからテストしてください。
+
+============================================
+ STEP 1: Send Email Hook を DELETE（最重要）
+  https://supabase.com/dashboard/project/rrzugscjdsqreesbgazu/auth/hooks
+============================================
+
+Send Email の Hook → Delete
+
+※ Delete が押せない → 先に STEP 2 の SMTP を Save
+
+============================================
+ STEP 2: Custom SMTP（Save 済みならスキップ）
+  https://supabase.com/dashboard/project/rrzugscjdsqreesbgazu/auth/smtp
+============================================
+
+Sender email : oripakawa@gmail.com
+Sender name  : ORIPA VAULT
+Host         : smtp.gmail.com
+Port         : 587
+Username     : oripakawa@gmail.com
+
+============================================
+ STEP 3: テスト
+  https://online-oripa.onrender.com/register
+============================================

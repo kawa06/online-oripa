@@ -1,5 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { TimeoutError, withTimeout } from "@/lib/with-timeout";
+
+const AUTH_TIMEOUT_MS = 5000;
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -27,8 +30,13 @@ export async function createClient() {
 
 export async function getUser() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  try {
+    const {
+      data: { user },
+    } = await withTimeout(supabase.auth.getUser(), AUTH_TIMEOUT_MS, "auth.getUser");
+    return user;
+  } catch (error) {
+    if (error instanceof TimeoutError) return null;
+    throw error;
+  }
 }

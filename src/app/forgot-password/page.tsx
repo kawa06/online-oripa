@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { formatAuthError } from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase/client";
+import { TimeoutError, withTimeout } from "@/lib/with-timeout";
+
+const EMAIL_TIMEOUT_MS = 20000;
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -16,18 +20,31 @@ export default function ForgotPasswordPage() {
     setMessage("");
     setLoading(true);
 
-    const supabase = createClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-    const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/auth/callback?next=/mypage`,
-    });
+    try {
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const { error: authError } = await withTimeout(
+        supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${appUrl}/auth/callback?next=/mypage`,
+        }),
+        EMAIL_TIMEOUT_MS,
+        "auth.resetPasswordForEmail",
+      );
 
-    setLoading(false);
-    if (authError) {
-      setError(authError.message);
-      return;
+      if (authError) {
+        setError(formatAuthError(authError, "メール送信に失敗しました。"));
+        return;
+      }
+      setMessage("パスワードリセット用のメールを送信しました。メールをご確認ください。");
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        setError("メール送信がタイムアウトしました。Supabase の Send Email Hook を Delete してください。");
+        return;
+      }
+      setError("メール送信に失敗しました。");
+    } finally {
+      setLoading(false);
     }
-    setMessage("パスワードリセット用のメールを送信しました。メールをご確認ください。");
   }
 
   return (

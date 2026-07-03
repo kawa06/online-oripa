@@ -43,6 +43,8 @@ function buildConfirmationUrl(emailData: EmailData) {
 }
 
 export async function POST(request: Request) {
+  // Deprecated: use Supabase Custom SMTP instead of Send Email Hook.
+  // Keep this route only if Hook is enabled in Supabase Dashboard.
   const hookSecret = process.env.SEND_EMAIL_HOOK_SECRET;
   if (!hookSecret) {
     return NextResponse.json({ error: "Hook not configured" }, { status: 503 });

@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { formatAuthError } from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase/client";
+import { TimeoutError, withTimeout } from "@/lib/with-timeout";
+
+const AUTH_TIMEOUT_MS = 20000;
 
 export default function LoginForm() {
   const router = useRouter();
@@ -20,29 +24,56 @@ export default function LoginForm() {
     setError("");
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const supabase = createClient();
+      const { error: authError } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+        AUTH_TIMEOUT_MS,
+        "auth.signInWithPassword",
+      );
 
-    setLoading(false);
-    if (authError) {
-      setError(authError.message);
-      return;
+      if (authError) {
+        setError(formatAuthError(authError, "ログインに失敗しました。"));
+        return;
+      }
+      router.push(next);
+      router.refresh();
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        setError("ログインがタイムアウトしました。ページを再読み込みしてお試しください。");
+        return;
+      }
+      setError("ログインに失敗しました。");
+    } finally {
+      setLoading(false);
     }
-    router.push(next);
-    router.refresh();
   }
 
   async function handleGoogle() {
     setError("");
     setLoading(true);
-    const supabase = createClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-    const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${appUrl}/auth/callback?next=${encodeURIComponent(next)}` },
-    });
-    setLoading(false);
-    if (authError) setError(authError.message);
+
+    try {
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const { error: authError } = await withTimeout(
+        supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: `${appUrl}/auth/callback?next=${encodeURIComponent(next)}` },
+        }),
+        AUTH_TIMEOUT_MS,
+        "auth.signInWithOAuth",
+      );
+      if (authError) setError(formatAuthError(authError, "Googleログインに失敗しました。"));
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        setError("Googleログインがタイムアウトしました。ページを再読み込みしてお試しください。");
+        return;
+      }
+      setError("Googleログインに失敗しました。");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

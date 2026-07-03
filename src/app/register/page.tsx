@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatAuthError } from "@/lib/auth-errors";
 import { createClient } from "@/lib/supabase/client";
+import { TimeoutError, withTimeout } from "@/lib/with-timeout";
+
+const SIGNUP_TIMEOUT_MS = 20000;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,38 +24,72 @@ export default function RegisterPage() {
     setMessage("");
     setLoading(true);
 
-    const supabase = createClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${appUrl}/auth/callback?next=/mypage`,
-        data: { display_name: displayName || email.split("@")[0] },
-      },
-    });
+    try {
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const { data, error: authError } = await withTimeout(
+        supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${appUrl}/auth/callback?next=/mypage`,
+            data: { display_name: displayName || email.split("@")[0] },
+          },
+        }),
+        SIGNUP_TIMEOUT_MS,
+        "auth.signUp",
+      );
 
-    setLoading(false);
-    if (authError) {
-      setError(authError.message);
-      return;
+      if (authError) {
+        setError(formatAuthError(authError, "登録に失敗しました。確認メールを送信できませんでした。"));
+        return;
+      }
+
+      if (data.user && data.user.identities?.length === 0) {
+        setMessage("このメールアドレスは登録済みの可能性があります。ログインするか、別のメールアドレスをお試しください。");
+        return;
+      }
+
+      setMessage("確認メールを送信しました。メール内のリンクから登録を完了してください。");
+      setTimeout(() => router.push("/login"), 3000);
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        setError(
+          "登録処理がタイムアウトしました。Supabase の Send Email Hook を Delete し、Custom SMTP が ON か確認してください。",
+        );
+        return;
+      }
+      setError("登録に失敗しました。しばらくしてから再度お試しください。");
+    } finally {
+      setLoading(false);
     }
-
-    setMessage("確認メールを送信しました。メール内のリンクから登録を完了してください。");
-    setTimeout(() => router.push("/login"), 3000);
   }
 
   async function handleGoogle() {
     setError("");
     setLoading(true);
-    const supabase = createClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
-    const { error: authError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${appUrl}/auth/callback?next=/mypage` },
-    });
-    setLoading(false);
-    if (authError) setError(authError.message);
+
+    try {
+      const supabase = createClient();
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+      const { error: authError } = await withTimeout(
+        supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: `${appUrl}/auth/callback?next=/mypage` },
+        }),
+        SIGNUP_TIMEOUT_MS,
+        "auth.signInWithOAuth",
+      );
+      if (authError) setError(formatAuthError(authError, "Google登録に失敗しました。"));
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        setError("Google登録がタイムアウトしました。ページを再読み込みしてお試しください。");
+        return;
+      }
+      setError("Google登録に失敗しました。");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

@@ -15,7 +15,15 @@
     "setup:storage": "node scripts/setup-storage.mjs",
     "setup:links": "node scripts/open-setup-links.mjs",
     "setup:production": "node scripts/setup-production.mjs",
-    "setup:email": "node scripts/configure-supabase-email.mjs"
+    "setup:email": "node scripts/configure-supabase-email.mjs",
+    "setup:smtp": "node scripts/configure-supabase-smtp.mjs",
+    "setup:disable-hook": "node scripts/disable-supabase-email-hook.mjs",
+    "setup:all": "node scripts/setup-supabase-email-all.mjs",
+    "setup:rate-limits": "node scripts/configure-supabase-rate-limits.mjs",
+    "fix:env": "node scripts/fix-env-credentials.mjs",
+    "save:env": "node scripts/save-env-credentials.mjs",
+    "verify:email": "node scripts/verify-supabase-email.mjs",
+    "restore:email": "node scripts/restore-email-manual.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

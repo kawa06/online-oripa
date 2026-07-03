@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { TimeoutError, withTimeout } from "@/lib/with-timeout";
+
+const AUTH_TIMEOUT_MS = 5000;
+
+const AUTH_ENTRY_PAGES = new Set(["/login", "/register", "/forgot-password"]);
 
 const PUBLIC_PREFIXES = [
   "/",
@@ -44,11 +49,24 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { pathname } = request.nextUrl;
+
+  // ログイン・登録ページは Supabase 応答待ちで止めない
+  if (AUTH_ENTRY_PAGES.has(pathname)) {
+    response.headers.set("x-pathname", pathname);
+    return response;
+  }
+
+  let user = null;
+
+  try {
+    const {
+      data: { user: authUser },
+    } = await withTimeout(supabase.auth.getUser(), AUTH_TIMEOUT_MS, "auth.getUser");
+    user = authUser;
+  } catch (error) {
+    if (!(error instanceof TimeoutError)) throw error;
+  }
 
   if (!user && !isPublic(pathname)) {
     const url = request.nextUrl.clone();
@@ -57,11 +75,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && (pathname === "/login" || pathname === "/register")) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/mypage";
-    return NextResponse.redirect(url);
-  }
-
+  response.headers.set("x-pathname", pathname);
   return response;
 }
