@@ -29,6 +29,20 @@ export default async function HomePage() {
 
   return (
     <div>
+      {announcements.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pt-8">
+          <h2 className="mb-4 text-lg font-bold">お知らせ</h2>
+          <div className="space-y-3">
+            {announcements.map((a) => (
+              <div key={a.id} className="card-surface p-4">
+                <p className="font-semibold">{a.title}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted">{a.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <div className="mb-6 flex items-end justify-between">
           <h1 className="text-2xl font-bold">ガチャ一覧</h1>
@@ -68,20 +82,6 @@ export default async function HomePage() {
           </div>
         )}
       </section>
-
-      {announcements.length > 0 && (
-        <section className="mx-auto max-w-6xl px-4 pb-8">
-          <h2 className="mb-4 text-lg font-bold">お知らせ</h2>
-          <div className="space-y-3">
-            {announcements.map((a) => (
-              <div key={a.id} className="card-surface p-4">
-                <p className="font-semibold">{a.title}</p>
-                <p className="mt-1 line-clamp-2 text-sm text-muted">{a.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {banners.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
