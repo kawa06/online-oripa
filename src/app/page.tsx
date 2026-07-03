@@ -29,27 +29,6 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <p className="mb-3 text-sm uppercase tracking-[0.2em] text-gold">Premium Online Oripa</p>
-          <h1 className="max-w-2xl text-4xl font-bold leading-tight md:text-5xl">
-            カードショップ品質の
-            <span className="gold-text"> オンラインオリパ</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-muted">
-            透明性の高い排出管理、スマホ最適UI、強力な発送・在庫・買取管理を一体化。
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/gacha" className="btn-primary">
-              ガチャを見る
-            </Link>
-            <Link href="/legal/buylist" className="btn-secondary">
-              買取表
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {banners.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-4">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,9 +66,9 @@ export default async function HomePage() {
         </section>
       )}
 
-      <section className="mx-auto max-w-6xl px-4 py-10">
+      <section className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-bold">人気ガチャ</h2>
+          <h1 className="text-2xl font-bold">ガチャ一覧</h1>
           <Link href="/gacha" className="text-sm text-gold">
             すべて見る →
           </Link>
