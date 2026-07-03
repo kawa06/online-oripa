@@ -9,6 +9,8 @@ type EmailPayload = {
   html: string;
 };
 
+const SEND_TIMEOUT_MS = 3500;
+
 function getResolvedFromAddress() {
   const shopName = getShopName();
   const configured = process.env.EMAIL_FROM ?? "";
@@ -20,21 +22,32 @@ function getResolvedFromAddress() {
   return `${shopName} <onboarding@resend.dev>`;
 }
 
+function withTimeout<T>(promise: Promise<T>, label: string) {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(`${label} timeout`)), SEND_TIMEOUT_MS);
+    }),
+  ]);
+}
+
 async function sendViaGmail(payload: EmailPayload) {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD?.replace(/\s/g, "");
   if (!user || !pass) return { sent: false as const };
 
-  const from = getResolvedFromAddress();
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
     secure: false,
     auth: { user, pass },
+    connectionTimeout: SEND_TIMEOUT_MS,
+    greetingTimeout: SEND_TIMEOUT_MS,
+    socketTimeout: SEND_TIMEOUT_MS,
   });
 
   await transporter.sendMail({
-    from,
+    from: getResolvedFromAddress(),
     to: payload.to,
     subject: payload.subject,
     html: payload.html,
@@ -47,36 +60,50 @@ async function sendViaResend(payload: EmailPayload) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { sent: false as const };
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: getResolvedFromAddress(),
-      to: payload.to,
-      subject: payload.subject,
-      html: payload.html,
-    }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`メール送信失敗: ${text}`);
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: getResolvedFromAddress(),
+        to: payload.to,
+        subject: payload.subject,
+        html: payload.html,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`メール送信失敗: ${text}`);
+    }
+
+    return { sent: true as const, via: "resend" as const };
+  } finally {
+    clearTimeout(timer);
   }
-
-  return { sent: true as const, via: "resend" as const };
 }
 
 export async function sendEmail(payload: EmailPayload) {
-  const gmail = await sendViaGmail(payload).catch((error) => {
-    throw error instanceof Error ? error : new Error("Gmail送信失敗");
-  });
-  if (gmail.sent) return gmail;
+  try {
+    const gmail = await withTimeout(sendViaGmail(payload), "Gmail");
+    if (gmail.sent) return gmail;
+  } catch {
+    // fall through to Resend
+  }
 
-  const resend = await sendViaResend(payload);
-  if (resend.sent) return resend;
+  try {
+    const resend = await withTimeout(sendViaResend(payload), "Resend");
+    if (resend.sent) return resend;
+  } catch {
+    // fall through
+  }
 
   if (process.env.NODE_ENV === "development") {
     console.log("[email:skipped]", payload.subject, "→", payload.to);
