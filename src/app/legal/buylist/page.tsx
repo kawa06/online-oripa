@@ -5,7 +5,14 @@ import type { BuylistCategory, BuylistItem } from "@prisma/client";
 
 function categoryLabel(cat: BuylistCategory) {
   const map: Record<BuylistCategory, string> = {
-    BOX: "BOX", PACK: "PACK", PSA: "PSA", SAR: "SAR", SR: "SR", AR: "AR", RR: "RR", OTHER: "その他",
+    BOX: "BOX",
+    PACK: "PACK",
+    PSA: "PSA",
+    SAR: "SAR",
+    SR: "SR",
+    AR: "AR",
+    RR: "RR",
+    OTHER: "その他",
   };
   return map[cat];
 }
@@ -33,9 +40,10 @@ export default async function BuylistPage() {
             <section key={category}>
               <h2 className="mb-4 text-lg font-bold gold-text">{categoryLabel(category as BuylistCategory)}</h2>
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[480px] text-sm">
+                <table className="w-full min-w-[560px] text-sm">
                   <thead>
                     <tr className="border-b border-border text-left text-muted">
+                      <th className="pb-2 pr-4 font-semibold">画像</th>
                       <th className="pb-2 pr-4 font-semibold">カード名</th>
                       <th className="pb-2 pr-4 font-semibold">状態</th>
                       <th className="pb-2 pr-4 font-semibold">買取価格</th>
@@ -45,6 +53,20 @@ export default async function BuylistPage() {
                   <tbody>
                     {catItems.map((item) => (
                       <tr key={item.id} className="border-b border-border/50">
+                        <td className="py-3 pr-4">
+                          {item.imageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="h-14 w-10 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-14 w-10 items-center justify-center rounded bg-bg-elevated text-xs text-muted">
+                              —
+                            </div>
+                          )}
+                        </td>
                         <td className="py-3 pr-4 font-medium">{item.name}</td>
                         <td className="py-3 pr-4 text-muted">{item.condition ?? "—"}</td>
                         <td className="py-3 pr-4 font-semibold text-gold">{formatYen(item.buyPrice)}</td>
@@ -58,7 +80,9 @@ export default async function BuylistPage() {
           ))}
         </div>
       )}
-      <Link href="/" className="mt-8 inline-block text-sm text-gold">← トップページ</Link>
+      <Link href="/" className="mt-8 inline-block text-sm text-gold">
+        ← トップページ
+      </Link>
     </div>
   );
 }

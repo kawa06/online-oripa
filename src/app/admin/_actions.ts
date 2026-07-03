@@ -205,39 +205,38 @@ export async function upsertBuylistItem(data: {
   condition?: string;
   buyPrice: number;
   note?: string;
+  imageUrl?: string;
   isPublished?: boolean;
 }) {
   await requireAdmin();
+  const payload = {
+    category: data.category,
+    name: data.name,
+    condition: data.condition,
+    buyPrice: data.buyPrice,
+    note: data.note,
+    imageUrl: data.imageUrl || null,
+    isPublished: data.isPublished ?? true,
+  };
   if (data.id) {
     await prisma.buylistItem.update({
       where: { id: data.id },
-      data: {
-        category: data.category,
-        name: data.name,
-        condition: data.condition,
-        buyPrice: data.buyPrice,
-        note: data.note,
-        isPublished: data.isPublished ?? true,
-      },
+      data: payload,
     });
   } else {
     await prisma.buylistItem.create({
-      data: {
-        category: data.category,
-        name: data.name,
-        condition: data.condition,
-        buyPrice: data.buyPrice,
-        note: data.note,
-      },
+      data: payload,
     });
   }
   revalidatePath("/admin/buylist");
+  revalidatePath("/legal/buylist");
 }
 
 export async function deleteBuylistItem(id: string) {
   await requireAdmin();
   await prisma.buylistItem.delete({ where: { id } });
   revalidatePath("/admin/buylist");
+  revalidatePath("/legal/buylist");
 }
 
 export async function updateUserMemo(userId: string, adminMemo: string) {

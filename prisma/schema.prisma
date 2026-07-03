@@ -307,6 +307,7 @@ model BuylistItem {
   condition   String?
   buyPrice    Int
   note        String?
+  imageUrl    String?
   isPublished Boolean         @default(true)
   updatedAt   DateTime        @updatedAt
   createdAt   DateTime        @default(now())
