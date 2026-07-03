@@ -3,12 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { formatYen } from "@/lib/utils";
 
 export default async function HomePage() {
-  const [gachas, banners] = await Promise.all([
+  const [gachas, announcements, banners] = await Promise.all([
     prisma.gacha
       .findMany({
         where: { status: "PUBLISHED" },
         orderBy: { publishedAt: "desc" },
         take: 6,
+      })
+      .catch(() => []),
+    prisma.announcement
+      .findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
       })
       .catch(() => []),
     prisma.banner
@@ -61,6 +68,20 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {announcements.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-8">
+          <h2 className="mb-4 text-lg font-bold">お知らせ</h2>
+          <div className="space-y-3">
+            {announcements.map((a) => (
+              <div key={a.id} className="card-surface p-4">
+                <p className="font-semibold">{a.title}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted">{a.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {banners.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 pb-10">
