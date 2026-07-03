@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ORIPA VAULT — セットアップ手順</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", "Hiragino Sans", "Meiryo", sans-serif;
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 0.25rem; color: #fff; }
+    .sub { color: #94a3b8; margin-bottom: 32px; }
+    .step {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      border-left: 4px solid #3b82f6;
+    }
+    .step-num {
+      display: inline-block;
+      background: #3b82f6;
+      color: #fff;
+      font-weight: bold;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 50%;
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+    h2 { font-size: 1.15rem; margin: 0 0 12px; color: #f1f5f9; display: flex; align-items: center; }
+    p { margin: 8px 0; }
+    a.btn {
+      display: inline-block;
+      background: #2563eb;
+      color: #fff !important;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      margin: 6px 6px 6px 0;
+      font-weight: 600;
+    }
+    a.btn:hover { background: #1d4ed8; }
+    a.btn.secondary { background: #475569; }
+    a.btn.secondary:hover { background: #64748b; }
+    a.btn.green { background: #16a34a; }
+    a.btn.green:hover { background: #15803d; }
+    code, .path {
+      background: #334155;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    ul { padding-left: 1.2rem; margin: 8px 0; }
+    li { margin: 6px 0; }
+    .note {
+      background: #422006;
+      border: 1px solid #b45309;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+    .ok {
+      background: #14532d;
+      border: 1px solid #22c55e;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+    th, td { border: 1px solid #475569; padding: 8px 10px; text-align: left; }
+    th { background: #334155; }
+    hr { border: none; border-top: 1px solid #334155; margin: 32px 0; }
+  </style>
+</head>
+<body>
+  <h1>ORIPA VAULT セットアップ</h1>
+  <p class="sub">上から順番にやるだけ。コードはもう入っています。</p>
+
+  <div class="step">
+    <h2><span class="step-num">1</span>Supabase アカウントを作る</h2>
+    <p>まだアカウントがなければ、ここから無料登録:</p>
+    <a class="btn" href="https://supabase.com/dashboard/sign-up" target="_blank">Supabase 無料登録</a>
+    <p>すでにログイン済みなら:</p>
+    <a class="btn secondary" href="https://supabase.com/dashboard" target="_blank">Supabase ダッシュボードを開く</a>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">2</span>Supabase で「プロジェクト」を新規作成</h2>
+    <ol>
+      <li>下のボタンをクリック</li>
+      <li>Organization を選ぶ（なければ New organization）</li>
+      <li>Name: 好きな名前（例: <code>oripa-vault</code>）</li>
+      <li>Database Password: <strong>必ずメモ</strong>（後で使います）</li>
+      <li>Region: <strong>Tokyo (Northeast Asia)</strong> を選ぶ</li>
+      <li>Create new project → 1〜2分待つ</li>
+    </ol>
+    <a class="btn" href="https://supabase.com/dashboard/new/new-project" target="_blank">新規プロジェクト作成</a>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">3</span>PC で初回セットアップを実行</h2>
+    <p>エクスプローラーでこのフォルダを開く:</p>
+    <p class="path">c:\Users\user1\projects\online-oripa</p>
+    <p><strong>「初回セットアップ.bat」</strong> をダブルクリック。</p>
+    <p>黒い画面が出て npm install が走ります。終わるまで待つ。</p>
+    <div class="note">⚠ この時点では DB エラーが出ても OK。次のステップで .env.local を埋めたあと、もう一度実行します。</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">4</span>Supabase の値をコピーして .env.local に貼る</h2>
+
+    <p><strong>4-1.</strong> 同じフォルダの <strong>「設定リンクを開く.bat」</strong> をダブルクリック</p>
+    <p>→ ブラウザに Supabase の設定ページが複数開き、メモ帳に <code>.env.local</code> が開きます。</p>
+
+    <p><strong>4-2.</strong> 開いた Supabase ページから、メモ帳の該当行に貼り付け:</p>
+    <table>
+      <tr><th>メモ帳の行</th><th>Supabase でコピーする場所</th></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>Settings → API → Project URL</td></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Settings → API → anon public</td></tr>
+      <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Settings → API → service_role（secret）</td></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>Settings → Database → URI → <strong>Transaction pooler (6543)</strong></td></tr>
+      <tr><td><code>DIRECT_URL</code></td><td>Settings → Database → URI → <strong>Session pooler または Direct (5432)</strong></td></tr>
+      <tr><td><code>ADMIN_EMAIL</code></td><td>管理者にしたい<strong>自分のメール</strong>（例: Gmail）</td></tr>
+    </table>
+
+    <p>手動で開く場合（プロジェクト作成後）:</p>
+    <a class="btn secondary" href="https://supabase.com/dashboard/project/_/settings/api" target="_blank">API Keys ページ</a>
+    <a class="btn secondary" href="https://supabase.com/dashboard/project/_/settings/database" target="_blank">Database 接続文字列</a>
+
+    <p><strong>4-3.</strong> メモ帳を <strong>上書き保存</strong>（Ctrl+S）して閉じる。</p>
+    <div class="note">💡 <code>[YOUR-PASSWORD]</code> と書いてある部分は、ステップ2でメモした Database Password に置き換えてください。</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">5</span>ログイン設定（Supabase で1回だけ）</h2>
+
+    <p><strong>5-1. Email ログインを ON</strong></p>
+    <a class="btn" href="https://supabase.com/dashboard/project/_/auth/providers" target="_blank">Auth → Providers を開く</a>
+    <p>→ <strong>Email</strong> を ON にする → Save</p>
+
+    <p><strong>5-2. リダイレクト URL を追加</strong></p>
+    <a class="btn" href="https://supabase.com/dashboard/project/_/auth/url-configuration" target="_blank">Auth → URL Configuration を開く</a>
+    <p>→ Redirect URLs に次を<strong>1行追加</strong>して Save:</p>
+    <p><code>http://localhost:3000/auth/callback</code></p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">6</span>もう一度「初回セットアップ.bat」を実行</h2>
+    <p><code>.env.local</code> を保存したあと、同じ <strong>初回セットアップ.bat</strong> をもう一度ダブルクリック。</p>
+    <p>今度は DB（db:push）とサンプルデータ（seed）が入ります。</p>
+    <div class="ok">✅ 「セットアップ完了」と出れば OK</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">7</span>アプリを起動</h2>
+    <p><strong>「起動.bat」</strong> をダブルクリック。</p>
+    <p>ブラウザで次を開く:</p>
+    <a class="btn green" href="http://localhost:3000" target="_blank">http://localhost:3000（トップ）</a>
+    <a class="btn green" href="http://localhost:3000/register" target="_blank">会員登録</a>
+    <a class="btn green" href="http://localhost:3000/admin" target="_blank">管理画面</a>
+    <a class="btn green" href="http://localhost:3000/gacha" target="_blank">ガチャ一覧</a>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-num">8</span>管理者として登録</h2>
+    <ol>
+      <li><a href="http://localhost:3000/register" target="_blank">会員登録</a> を開く</li>
+      <li><code>ADMIN_EMAIL</code> に書いた<strong>同じメール</strong>で登録</li>
+      <li><a href="http://localhost:3000/admin" target="_blank">管理画面</a> にアクセス → 管理者メニューが使える</li>
+    </ol>
+  </div>
+
+  <hr />
+  <h2 style="border:none;padding:0;">困ったとき</h2>
+  <table>
+    <tr><th>症状</th><th>やること</th></tr>
+    <tr><td>ログインできない</td><td><a href="https://supabase.com/dashboard/project/_/auth/providers" target="_blank">Email を ON</a> + Redirect URL 確認</td></tr>
+    <tr><td>ガチャが空</td><td>初回セットアップ.bat を再実行</td></tr>
+    <tr><td>DB エラー</td><td>.env.local の DATABASE_URL / DIRECT_URL を確認</td></tr>
+  </table>
+
+  <p style="margin-top:24px;color:#64748b;font-size:0.85rem;">
+    任意: <a href="https://dashboard.stripe.com/test/apikeys" target="_blank" style="color:#94a3b8;">Stripe</a>（ポイント購入） /
+    <a href="https://resend.com/api-keys" target="_blank" style="color:#94a3b8;">Resend</a>（メール） /
+    <a href="https://vercel.com/new" target="_blank" style="color:#94a3b8;">Vercel</a>（本番公開）
+  </p>
+</body>
+</html>

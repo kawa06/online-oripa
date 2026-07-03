@@ -1,0 +1,390 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum GachaStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+enum PrizeRank {
+  S
+  A
+  B
+  C
+  LOSE
+  LAST_ONE
+  KIRI
+}
+
+enum WinStatus {
+  HELD
+  POINT_CONVERTED
+  SHIPPING_REQUESTED
+  SHIPPED
+}
+
+enum ShippingStatus {
+  PENDING
+  UNCONFIRMED
+  PACKING
+  READY
+  SHIPPED
+  CONTACTED
+}
+
+enum PointTxType {
+  PURCHASE
+  GACHA
+  CONVERT
+  ADMIN_GRANT
+  ADMIN_DEDUCT
+  LOGIN_BONUS
+  COUPON
+  REFUND
+}
+
+enum BuylistCategory {
+  BOX
+  PACK
+  PSA
+  SAR
+  SR
+  AR
+  RR
+  OTHER
+}
+
+enum InquiryStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+model Profile {
+  id               String   @id @db.Uuid
+  email            String   @unique
+  displayName      String?
+  phone            String?
+  role             UserRole @default(USER)
+  points           Int      @default(0)
+  loginBonusLastAt DateTime?
+  adminMemo        String?
+  lastIp           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  addresses         UserAddress[]
+  pointTxs          PointTransaction[]
+  pulls             GachaPull[]
+  wins              UserWin[]
+  shippingRequests  ShippingRequest[]
+  inquiries         ContactInquiry[]
+  notifications     Notification[]
+  couponRedemptions CouponRedemption[]
+}
+
+model UserAddress {
+  id           String   @id @default(cuid())
+  userId       String   @db.Uuid
+  label        String   @default("自宅")
+  postalCode   String
+  prefecture   String
+  city         String
+  addressLine  String
+  building     String?
+  phone        String
+  recipientName String
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PointTransaction {
+  id          String      @id @default(cuid())
+  userId      String      @db.Uuid
+  type        PointTxType
+  amount      Int
+  balanceAfter Int
+  description String?
+  stripeSessionId String?
+  createdAt   DateTime    @default(now())
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Card {
+  id              String   @id @default(cuid())
+  name            String
+  category        String?
+  condition       String?
+  rank            PrizeRank?
+  imageUrl        String?
+  stockQuantity   Int      @default(0)
+  marketPrice     Int      @default(0)
+  buyPrice        Int      @default(0)
+  sellPrice       Int      @default(0)
+  managementCode  String   @unique
+  barcode         String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  prizes       GachaPrize[]
+  wins         UserWin[]
+  priceHistory CardPriceHistory[]
+}
+
+model CardPriceHistory {
+  id         String   @id @default(cuid())
+  cardId     String
+  marketPrice Int
+  buyPrice   Int
+  sellPrice  Int
+  changedAt  DateTime @default(now())
+  note       String?
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+}
+
+model Gacha {
+  id              String      @id @default(cuid())
+  title           String
+  description     String?
+  imageUrl        String?
+  pricePerPull    Int
+  totalSlots      Int
+  remainingSlots  Int
+  status          GachaStatus @default(DRAFT)
+  isDailyOnce     Boolean     @default(false)
+  isFirstTimeOnly Boolean     @default(false)
+  kiriNumber      Int?
+  minGuaranteeRank PrizeRank?
+  minGuaranteeNote String?
+  noticeText      String?
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  prizes GachaPrize[]
+  pulls  GachaPull[]
+}
+
+model GachaPrize {
+  id                String    @id @default(cuid())
+  gachaId           String
+  cardId            String?
+  rank              PrizeRank
+  name              String
+  imageUrl          String?
+  condition         String?
+  quantity          Int
+  remainingQuantity Int
+  marketPrice       Int       @default(0)
+  costPrice         Int       @default(0)
+  sortOrder         Int       @default(0)
+
+  gacha Gacha @relation(fields: [gachaId], references: [id], onDelete: Cascade)
+  card  Card? @relation(fields: [cardId], references: [id])
+
+  pullResults PullResult[]
+
+  @@index([gachaId])
+}
+
+model GachaPull {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  gachaId   String
+  pullCount Int
+  totalCost Int
+  createdAt DateTime @default(now())
+
+  user    Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gacha   Gacha        @relation(fields: [gachaId], references: [id])
+  results PullResult[]
+
+  @@index([userId, createdAt])
+  @@index([gachaId])
+}
+
+model PullResult {
+  id           String @id @default(cuid())
+  pullId       String
+  gachaPrizeId String
+  slotNumber   Int
+
+  pull       GachaPull  @relation(fields: [pullId], references: [id], onDelete: Cascade)
+  gachaPrize GachaPrize @relation(fields: [gachaPrizeId], references: [id])
+  userWin    UserWin?
+
+  @@index([pullId])
+}
+
+model UserWin {
+  id           String    @id @default(cuid())
+  userId       String    @db.Uuid
+  pullResultId String    @unique
+  cardId       String?
+  name         String
+  imageUrl     String?
+  rank         PrizeRank
+  pointValue   Int       @default(0)
+  status       WinStatus @default(HELD)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user       Profile              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pullResult PullResult           @relation(fields: [pullResultId], references: [id])
+  card       Card?                @relation(fields: [cardId], references: [id])
+  shippingItems ShippingRequestItem[]
+
+  @@index([userId, status])
+}
+
+model ShippingRequest {
+  id             String         @id @default(cuid())
+  userId         String         @db.Uuid
+  status         ShippingStatus @default(PENDING)
+  trackingNumber String?
+  recipientName  String
+  phone          String
+  postalCode     String
+  prefecture     String
+  city           String
+  addressLine    String
+  building       String?
+  boxBarcode     String?
+  shippingBarcode String?
+  adminMemo      String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  user  Profile               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items ShippingRequestItem[]
+
+  @@index([status, createdAt])
+  @@index([userId])
+}
+
+model ShippingRequestItem {
+  id                String @id @default(cuid())
+  shippingRequestId String
+  userWinId         String
+  managementCode    String
+  barcode           String
+
+  shippingRequest ShippingRequest @relation(fields: [shippingRequestId], references: [id], onDelete: Cascade)
+  userWin         UserWin         @relation(fields: [userWinId], references: [id])
+
+  @@index([shippingRequestId])
+  @@index([barcode])
+}
+
+model BuylistItem {
+  id          String          @id @default(cuid())
+  category    BuylistCategory
+  name        String
+  condition   String?
+  buyPrice    Int
+  note        String?
+  isPublished Boolean         @default(true)
+  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime        @default(now())
+
+  @@index([category, isPublished])
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Coupon {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  points       Int
+  maxUses      Int?
+  usedCount    Int       @default(0)
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  redemptions CouponRedemption[]
+}
+
+model CouponRedemption {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  coupon Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  title     String
+  body      String
+  linkUrl   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+}
+
+model ContactInquiry {
+  id        String        @id @default(cuid())
+  userId    String?       @db.Uuid
+  name      String
+  email     String
+  subject   String
+  body      String
+  status    InquiryStatus @default(OPEN)
+  adminReply String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  user Profile? @relation(fields: [userId], references: [id])
+
+  @@index([status])
+}

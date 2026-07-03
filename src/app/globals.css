@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0a0a0b;
+  --bg-card: #141416;
+  --bg-elevated: #1c1c1f;
+  --gold: #d4af37;
+  --gold-light: #f0d875;
+  --accent: #3b82f6;
+  --text: #f5f5f5;
+  --muted: #a1a1aa;
+  --border: #27272a;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-card: var(--bg-card);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.gold-text {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-surface {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  color: #111;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.input-field:focus {
+  outline: 2px solid color-mix(in srgb, var(--gold) 50%, transparent);
+  border-color: var(--gold);
+}
+
+@keyframes gacha-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.gacha-shake {
+  animation: gacha-shake 0.4s ease-in-out infinite;
+}
+
+@keyframes gacha-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }
+}
+
+.gacha-glow {
+  animation: gacha-glow 1.2s ease-in-out infinite;
+}
+
+@keyframes gacha-flash {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.8); }
+}
+
+.gacha-flash {
+  animation: gacha-flash 0.6s ease-in-out;
+}
+
+.gacha-reveal {
+  box-shadow: 0 0 60px rgba(212, 175, 55, 0.8);
+}
