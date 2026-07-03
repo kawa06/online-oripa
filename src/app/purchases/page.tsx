@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { getSessionProfile } from "@/lib/auth";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import type { PointTxType } from "@prisma/client";
 
@@ -49,8 +49,8 @@ export default async function PurchasesPage() {
                   <p className="mt-1 text-xs text-muted">{format(tx.createdAt, "yyyy/MM/dd HH:mm", { locale: ja })}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-gold">+{formatYen(tx.amount)}</p>
-                  <p className="text-xs text-muted">残高 {formatYen(tx.balanceAfter)}</p>
+                  <p className="font-bold text-gold">+{formatPoints(tx.amount)}</p>
+                  <p className="text-xs text-muted">残高 {formatPoints(tx.balanceAfter)}</p>
                 </div>
               </div>
             </div>

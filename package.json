@@ -13,7 +13,9 @@
     "setup": "node scripts/setup.mjs",
     "setup:env": "node scripts/setup-env.mjs",
     "setup:storage": "node scripts/setup-storage.mjs",
-    "setup:links": "node scripts/open-setup-links.mjs"
+    "setup:links": "node scripts/open-setup-links.mjs",
+    "setup:production": "node scripts/setup-production.mjs",
+    "setup:email": "node scripts/configure-supabase-email.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -26,21 +28,29 @@
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.110.0",
     "@tailwindcss/postcss": "^4",
+    "@tsparticles/react": "^4.3.1",
+    "@tsparticles/slim": "^4.3.1",
     "date-fns": "^4.4.0",
+    "framer-motion": "^12.42.2",
+    "howler": "^2.2.4",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
+    "nodemailer": "^9.0.3",
     "prisma": "^6.19.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.9.1",
     "server-only": "^0.0.1",
+    "standardwebhooks": "^1.0.0",
     "stripe": "^22.3.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.13",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

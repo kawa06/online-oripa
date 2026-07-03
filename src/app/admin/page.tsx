@@ -1,5 +1,5 @@
 ﻿import { prisma } from "@/lib/prisma";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
 import { LOW_STOCK_THRESHOLD } from "@/lib/constants";
 import { detectFraudAlerts } from "@/lib/fraud";
 import { startOfDay, startOfMonth, subDays, format } from "date-fns";
@@ -71,11 +71,11 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="card-surface p-5">
           <p className="text-sm text-muted">本日の売上</p>
-          <p className="mt-2 text-3xl font-bold text-gold">{formatYen(salesToday._sum.amount ?? 0)}</p>
+          <p className="mt-2 text-3xl font-bold text-gold">{formatPoints(salesToday._sum.amount ?? 0)}</p>
         </div>
         <div className="card-surface p-5">
           <p className="text-sm text-muted">今月の売上</p>
-          <p className="mt-2 text-3xl font-bold text-gold">{formatYen(salesMonth._sum.amount ?? 0)}</p>
+          <p className="mt-2 text-3xl font-bold text-gold">{formatPoints(salesMonth._sum.amount ?? 0)}</p>
         </div>
         <div className="card-surface p-5">
           <p className="text-sm text-muted">公開中ガチャ</p>

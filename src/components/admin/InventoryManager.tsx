@@ -210,7 +210,7 @@ export function InventoryManager({
           )}
         </div>
       </form>
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface table-scroll">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-bg-elevated text-left text-muted">
             <tr>

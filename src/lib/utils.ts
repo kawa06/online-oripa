@@ -2,6 +2,10 @@ export function formatYen(n: number) {
   return `¥${n.toLocaleString("ja-JP")}`;
 }
 
+export function formatPoints(n: number) {
+  return `${n.toLocaleString("ja-JP")} Pコイン`;
+}
+
 export function calcGachaMetrics(
   totalSlots: number,
   pricePerPull: number,

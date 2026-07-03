@@ -21,10 +21,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     const supabase = createClient();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
     const { error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${appUrl}/auth/callback?next=/mypage`,
         data: { display_name: displayName || email.split("@")[0] },
       },
     });

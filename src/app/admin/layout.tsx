@@ -1,6 +1,6 @@
 ﻿import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminLayoutClient } from "@/components/admin/AdminLayoutClient";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +11,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/");
   }
 
-  return (
-    <div className="flex min-h-[70vh]">
-      <AdminSidebar />
-      <div className="flex-1 overflow-auto p-6">{children}</div>
-    </div>
-  );
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }
-

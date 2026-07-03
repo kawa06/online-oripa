@@ -1,0 +1,49 @@
+【重要】npm run setup:email の黒い画面の出力は貼らないでください。
+このファイルの「本文HTML」だけをコピーしてください。
+
+========================================
+① Subject（件名）— これだけコピー
+========================================
+
+ORIPA VAULT へのご登録ありがとうございます
+
+
+========================================
+② Body（本文）— source タブに貼る
+   <!DOCTYPE から </html> まで全部
+========================================
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="margin: 0; padding: 0; background: #f4f4f5; font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; color: #18181b; line-height: 1.7;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: #f4f4f5; padding: 24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; background: #ffffff; border: 1px solid #e4e4e7; border-radius: 12px; overflow: hidden;">
+          <tr>
+            <td style="padding: 28px 24px 8px;">
+              <p style="margin: 0 0 24px; font-size: 18px; font-weight: 700;">ORIPA VAULT へのご登録ありがとうございます</p>
+              <p style="margin: 0 0 16px;">{{ .Email }} 様</p>
+              <p style="margin: 0 0 16px;">ORIPA VAULT の会員登録が完了しました。オンラインオリパの抽選にご参加いただけます。</p>
+              <p style="margin: 24px 0 8px; font-weight: 600;">次の画面へ進む:</p>
+              <p style="margin: 0 0 24px; word-break: break-all;">
+                <a href="{{ .ConfirmationURL }}" style="color: #2563eb; text-decoration: underline;">{{ .ConfirmationURL }}</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 24px; background: #fafafa; border-top: 1px solid #e4e4e7; font-size: 13px; color: #71717a;">
+              <p style="margin: 0 0 8px; font-weight: 700; color: #18181b;">ORIPA VAULT</p>
+              <p style="margin: 0;">本メールは配信専用です。返信は <a href="mailto:oripakawa@gmail.com" style="color: #2563eb;">oripakawa@gmail.com</a> へお送りください。</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

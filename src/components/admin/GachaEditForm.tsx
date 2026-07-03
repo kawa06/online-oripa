@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useMemo, useState } from "react";
-import { calcGachaMetrics, formatYen } from "@/lib/utils";
+import { calcGachaMetrics, formatPoints, formatYen } from "@/lib/utils";
 import { addGachaPrize, deleteGachaPrize, updateGacha } from "@/app/admin/_actions";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import type { Gacha, GachaPrize, GachaStatus, PrizeRank } from "@prisma/client";
@@ -81,7 +81,7 @@ export function GachaEditForm({
         <ImageUploadField folder="gachas" value={imageUrl} onChange={setImageUrl} label="ガチャ画像" />
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label className="mb-1 block text-sm text-muted">単価 (pt)</label>
+            <label className="mb-1 block text-sm text-muted">単価 (Pコイン)</label>
             <input type="number" className="input-field" value={pricePerPull} onChange={(e) => setPricePerPull(Number(e.target.value))} />
           </div>
           <div>
@@ -127,8 +127,8 @@ export function GachaEditForm({
       <div className="card-surface p-5">
         <h2 className="mb-3 font-bold">還元指標</h2>
         <div className="grid gap-2 text-sm sm:grid-cols-2">
-          <p>想定売上: {formatYen(metrics.totalRevenue)}</p>
-          <p>利益: {formatYen(metrics.profit)}</p>
+          <p>想定売上: {formatPoints(metrics.totalRevenue)}</p>
+          <p>利益: {formatPoints(metrics.profit)}</p>
           <p className="sm:col-span-2">
             還元率:{" "}
             <span className={metrics.returnRate < 70 ? "font-bold text-red-500" : "text-success"}>
@@ -141,7 +141,7 @@ export function GachaEditForm({
         )}
       </div>
 
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface table-scroll">
         <h2 className="border-b border-border p-4 font-bold">景品一覧</h2>
         <table className="w-full text-sm">
           <thead className="bg-bg-elevated text-left text-muted">

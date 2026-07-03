@@ -52,7 +52,7 @@ export default function NotificationsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-bold">{n.title}</p>
-                  <p className="mt-1 text-sm text-muted">{n.body}</p>
+                  <p className="mt-1 break-words whitespace-pre-wrap text-sm text-muted">{n.body}</p>
                   <p className="mt-2 text-xs text-muted">
                     {format(new Date(n.createdAt), "yyyy/MM/dd HH:mm", { locale: ja })}
                   </p>

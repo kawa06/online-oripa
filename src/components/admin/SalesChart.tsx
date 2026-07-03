@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPoints } from "@/lib/utils";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export function SalesChart({ data }: { data: { date: string; sales: number }[] }) {
@@ -15,7 +16,7 @@ export function SalesChart({ data }: { data: { date: string; sales: number }[] }
               border: "1px solid #27272a",
               borderRadius: "0.5rem",
             }}
-            formatter={(value) => [`¥${Number(value).toLocaleString()}`, "売上"]}
+            formatter={(value) => [formatPoints(Number(value)), "売上"]}
           />
           <Bar dataKey="sales" fill="#d4af37" radius={[4, 4, 0, 0]} />
         </BarChart>

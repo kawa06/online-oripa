@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { updateUserMemo } from "@/app/admin/_actions";
+import { formatPoints } from "@/lib/utils";
 import type { PointTransaction, Profile } from "@prisma/client";
 
 export function UserDetailPanel({
@@ -47,7 +48,7 @@ export function UserDetailPanel({
           <div><dt className="text-muted">電話</dt><dd>{user.phone ?? "—"}</dd></div>
           <div><dt className="text-muted">最終IP</dt><dd className="font-mono text-xs">{user.lastIp ?? "—"}</dd></div>
           <div><dt className="text-muted">ロール</dt><dd>{user.role}</dd></div>
-          <div><dt className="text-muted">ポイント</dt><dd className="text-gold font-bold">{user.points.toLocaleString()} pt</dd></div>
+          <div><dt className="text-muted">Pコイン枚数</dt><dd className="text-gold font-bold">{formatPoints(user.points)}</dd></div>
         </dl>
       </div>
 
@@ -102,7 +103,7 @@ export function UserDetailPanel({
         </button>
       </div>
 
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface table-scroll">
         <h2 className="border-b border-border p-4 font-bold">ポイント履歴</h2>
         <table className="w-full text-sm">
           <thead className="bg-bg-elevated text-left text-muted">

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { getSessionProfile } from "@/lib/auth";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 
 export default async function HistoryPage() {
@@ -30,7 +30,7 @@ export default async function HistoryPage() {
                   <p className="mt-1 text-sm text-muted">{format(pull.createdAt, "yyyy/MM/dd HH:mm", { locale: ja })}</p>
                 </div>
                 <div className="text-right text-sm">
-                  <p>{pull.pullCount}回 · {formatYen(pull.totalCost)}</p>
+                  <p>{pull.pullCount}回 · {formatPoints(pull.totalCost)}</p>
                   <p className="text-muted">{pull.results.length} 景品</p>
                 </div>
               </div>

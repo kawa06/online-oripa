@@ -1,5 +1,9 @@
 import "server-only";
 
+import { getShopName } from "@/lib/brand";
+import { buildBrandedEmailHtml } from "@/lib/email/templates";
+import { sendEmail as sendEmailTransport } from "@/lib/email/transport";
+
 type EmailPayload = {
   to: string;
   subject: string;
@@ -7,31 +11,7 @@ type EmailPayload = {
 };
 
 export async function sendEmail(payload: EmailPayload) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM ?? "ORIPA VAULT <noreply@example.com>";
-
-  if (!apiKey) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("[email:skipped]", payload.subject, "→", payload.to);
-    }
-    return { sent: false as const };
-  }
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from, to: payload.to, subject: payload.subject, html: payload.html }),
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`メール送信失敗: ${text}`);
-  }
-
-  return { sent: true as const };
+  return sendEmailTransport(payload);
 }
 
 export async function sendShippingStatusEmail(params: {
@@ -40,6 +20,7 @@ export async function sendShippingStatusEmail(params: {
   status: string;
   trackingNumber?: string | null;
 }) {
+  const shopName = getShopName();
   const statusLabel: Record<string, string> = {
     PACKING: "梱包中",
     READY: "発送準備完了",
@@ -47,19 +28,25 @@ export async function sendShippingStatusEmail(params: {
     CONTACTED: "連絡済み",
   };
   const label = statusLabel[params.status] ?? params.status;
-  const tracking = params.trackingNumber
-    ? `<p>追跡番号: <strong>${params.trackingNumber}</strong></p>`
-    : "";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const trackingLine = params.trackingNumber
+    ? `追跡番号: ${params.trackingNumber}`
+    : "配送状況はマイページからご確認いただけます。";
 
   return sendEmail({
     to: params.to,
-    subject: `【ORIPA VAULT】発送状況の更新: ${label}`,
-    html: `
-      <p>${params.recipientName} 様</p>
-      <p>発送依頼のステータスが「${label}」に更新されました。</p>
-      ${tracking}
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/shipping/history">配送履歴を確認</a></p>
-    `,
+    subject: `【${shopName}】発送状況の更新: ${label}`,
+    html: buildBrandedEmailHtml({
+      email: params.to,
+      recipient: params.recipientName,
+      headline: `【${shopName}】発送状況の更新`,
+      bodyLines: [
+        `発送依頼のステータスが「${label}」に更新されました。`,
+        trackingLine,
+      ],
+      actionLabel: "配送履歴を確認する",
+      actionUrl: `${appUrl}/shipping/history`,
+    }),
   });
 }
 
@@ -70,23 +57,30 @@ export async function sendInquiryStatusEmail(params: {
   status: string;
   adminReply?: string;
 }) {
+  const shopName = getShopName();
   const labels: Record<string, string> = {
     OPEN: "受付済み",
     IN_PROGRESS: "対応中",
     CLOSED: "完了",
   };
   const label = labels[params.status] ?? params.status;
-  const reply = params.adminReply
-    ? `<p><strong>返信:</strong></p><p>${params.adminReply.replace(/\n/g, "<br>")}</p>`
-    : "<p>内容を確認のうえ、順次ご返信いたします。</p>";
+  const replyLine = params.adminReply
+    ? `返信: ${params.adminReply.replace(/\n/g, " ")}`
+    : "内容を確認のうえ、順次ご返信いたします。";
 
   return sendEmail({
     to: params.to,
-    subject: `【ORIPA VAULT】お問い合わせ更新: ${label}`,
-    html: `
-      <p>${params.name} 様</p>
-      <p>お問い合わせ「${params.subject}」のステータスが「${label}」に更新されました。</p>
-      ${reply}
-    `,
+    subject: `【${shopName}】お問い合わせ更新: ${label}`,
+    html: buildBrandedEmailHtml({
+      email: params.to,
+      recipient: params.name,
+      headline: `【${shopName}】お問い合わせ更新`,
+      bodyLines: [
+        `お問い合わせ「${params.subject}」のステータスが「${label}」に更新されました。`,
+        replyLine,
+      ],
+      actionLabel: "お問い合わせページへ",
+      actionUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/contact`,
+    }),
   });
 }

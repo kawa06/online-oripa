@@ -122,3 +122,18 @@ body {
 .gacha-reveal {
   box-shadow: 0 0 60px rgba(212, 175, 55, 0.8);
 }
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll table {
+  min-width: 640px;
+}
+
+@media (min-width: 768px) {
+  .table-scroll table {
+    min-width: 0;
+  }
+}

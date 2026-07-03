@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
 
 type Props = {
   gachaId: string;
@@ -53,7 +53,7 @@ export function GachaPurchasePanel({
           className={`btn-primary flex-1 text-center ${!agreed || !canPull1 ? "pointer-events-none opacity-45" : ""}`}
           aria-disabled={!agreed || !canPull1}
         >
-          1回引く（{formatYen(pricePerPull)}）
+          1回引く（{formatPoints(pricePerPull)}）
         </Link>
         {!singleOnly && (
           <Link
@@ -61,7 +61,7 @@ export function GachaPurchasePanel({
             className={`btn-secondary flex-1 text-center ${!agreed || !canPull10 ? "pointer-events-none opacity-45" : ""}`}
             aria-disabled={!agreed || !canPull10}
           >
-            10連引く（{formatYen(pricePerPull * 10)}）
+            10連引く（{formatPoints(pricePerPull * 10)}）
           </Link>
         )}
       </div>

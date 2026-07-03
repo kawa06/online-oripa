@@ -40,7 +40,7 @@ export function BannerManager({ banners }: { banners: Banner[] }) {
         <button type="submit" className="btn-primary" disabled={loading}>{loading ? "保存中..." : "追加"}</button>
       </form>
 
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface table-scroll">
         <table className="w-full text-sm">
           <thead className="bg-bg-elevated text-left text-muted">
             <tr>

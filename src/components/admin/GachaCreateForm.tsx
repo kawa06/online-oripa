@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { calcGachaMetrics, formatYen } from "@/lib/utils";
+import { calcGachaMetrics, formatPoints, formatYen } from "@/lib/utils";
 import { createGacha } from "@/app/admin/_actions";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import type { PrizeRank } from "@prisma/client";
@@ -99,7 +99,7 @@ export function GachaCreateForm({ cards = [] }: { cards?: { id: string; name: st
         <ImageUploadField folder="gachas" value={imageUrl} onChange={setImageUrl} label="ガチャ画像" />
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-sm text-muted">1回あたり価格 (pt)</label>
+            <label className="mb-1 block text-sm text-muted">1回あたり価格 (Pコイン)</label>
             <input type="number" className="input-field" value={pricePerPull} onChange={(e) => setPricePerPull(Number(e.target.value))} min={1} required />
           </div>
           <div>
@@ -169,10 +169,10 @@ export function GachaCreateForm({ cards = [] }: { cards?: { id: string; name: st
       <div className="card-surface p-5">
         <h2 className="mb-3 font-bold">還元シミュレーション</h2>
         <div className="grid gap-2 text-sm sm:grid-cols-2">
-          <p>想定売上: {formatYen(metrics.totalRevenue)}</p>
+          <p>想定売上: {formatPoints(metrics.totalRevenue)}</p>
           <p>景品原価: {formatYen(metrics.totalCost)}</p>
           <p>景品相場合計: {formatYen(metrics.totalPrizeValue)}</p>
-          <p>利益: {formatYen(metrics.profit)}</p>
+          <p>利益: {formatPoints(metrics.profit)}</p>
           <p className="sm:col-span-2">
             還元率:{" "}
             <span className={metrics.returnRate < 70 ? "font-bold text-red-500" : "text-success"}>

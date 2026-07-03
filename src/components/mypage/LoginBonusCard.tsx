@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOGIN_BONUS_POINTS } from "@/lib/constants";
+import { formatPoints } from "@/lib/utils";
 
 type Props = {
   canClaim: boolean;
@@ -27,7 +28,7 @@ export function LoginBonusCard({ canClaim, points }: Props) {
     }
     if (data.claimed) {
       setCurrentPoints(data.points);
-      setMessage(`${data.bonus}pt を受け取りました！`);
+      setMessage(`${formatPoints(data.bonus)} を受け取りました！`);
       router.refresh();
     } else {
       setMessage("本日のボーナスはすでに受け取り済みです");
@@ -37,9 +38,9 @@ export function LoginBonusCard({ canClaim, points }: Props) {
   return (
     <div className="card-surface mt-6 p-6">
       <h2 className="font-bold">ログインボーナス</h2>
-      <p className="mt-1 text-sm text-muted">毎日 {LOGIN_BONUS_POINTS}pt プレゼント</p>
+      <p className="mt-1 text-sm text-muted">毎日 {formatPoints(LOGIN_BONUS_POINTS)} プレゼント</p>
       <p className="mt-3 text-sm text-muted">
-        現在: <span className="font-bold text-gold">{currentPoints.toLocaleString()} pt</span>
+        現在: <span className="font-bold text-gold">{formatPoints(currentPoints)}</span>
       </p>
       {message && <p className="mt-3 text-sm text-success">{message}</p>}
       <button

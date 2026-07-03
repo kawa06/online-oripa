@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
+import { AnnouncementItem } from "@/components/home/AnnouncementItem";
 
 export default async function HomePage() {
   const [gachas, announcements, banners] = await Promise.all([
@@ -34,10 +35,7 @@ export default async function HomePage() {
           <h2 className="mb-4 text-lg font-bold">お知らせ</h2>
           <div className="space-y-3">
             {announcements.map((a) => (
-              <div key={a.id} className="card-surface p-4">
-                <p className="font-semibold">{a.title}</p>
-                <p className="mt-1 line-clamp-2 text-sm text-muted">{a.body}</p>
-              </div>
+              <AnnouncementItem key={a.id} title={a.title} body={a.body} />
             ))}
           </div>
         </section>
@@ -72,7 +70,7 @@ export default async function HomePage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold">{g.title}</h3>
-                  <p className="mt-2 font-semibold text-gold">{formatYen(g.pricePerPull)} / 1回</p>
+                  <p className="mt-2 font-semibold text-gold">{formatPoints(g.pricePerPull)} / 1回</p>
                   <p className="mt-1 text-xs text-muted">
                     残り {g.remainingSlots.toLocaleString()} / {g.totalSlots.toLocaleString()} 口
                   </p>

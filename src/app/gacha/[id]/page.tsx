@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSessionProfile } from "@/lib/auth";
-import { calcGachaMetrics, formatYen } from "@/lib/utils";
+import { calcGachaMetrics, formatPoints, formatYen } from "@/lib/utils";
 import { rankLabel } from "@/lib/gacha-utils";
 import { GachaLiveStats } from "@/components/gacha/GachaLiveStats";
 import { GachaPurchasePanel } from "./GachaPurchasePanel";
@@ -46,7 +46,7 @@ export default async function GachaDetailPage({ params }: Props) {
           <h1 className="text-2xl font-bold md:text-3xl">{gacha.title}</h1>
           {gacha.description && <p className="mt-2 text-muted">{gacha.description}</p>}
           <p className="mt-4 text-xl font-bold text-gold">
-            {formatYen(gacha.pricePerPull)} / 1回
+            {formatPoints(gacha.pricePerPull)} / 1回
           </p>
 
           <div className="card-surface mt-4 p-4">

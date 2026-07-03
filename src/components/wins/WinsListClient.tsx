@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useState } from "react";
 import { rankLabel } from "@/lib/gacha-utils";
+import { formatPoints } from "@/lib/utils";
 import { WinRowActions } from "@/app/wins/WinRowActions";
 import type { PrizeRank, WinStatus } from "@prisma/client";
 
@@ -123,7 +124,7 @@ export function WinsListClient({ wins }: { wins: Win[] }) {
                 <p className="text-xs font-semibold text-gold">{rankLabel(win.rank)}</p>
                 <p className="font-bold">{win.name}</p>
                 <p className="text-sm text-muted">
-                  変換 ¥{win.pointValue.toLocaleString("ja-JP")} · {statusLabel(win.status)}
+                  変換 {formatPoints(win.pointValue)} · {statusLabel(win.status)}
                 </p>
                 <p className="text-xs text-muted">
                   {format(new Date(win.createdAt), "yyyy/MM/dd HH:mm", { locale: ja })}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatPoints } from "@/lib/utils";
 
 export function CouponRedeemForm() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function CouponRedeemForm() {
       setError(data.error ?? "使用に失敗しました");
       return;
     }
-    setMessage(`${data.code} で ${data.bonus}pt を獲得しました`);
+    setMessage(`${data.code} で ${formatPoints(data.bonus)} を獲得しました`);
     setCode("");
     router.refresh();
   }

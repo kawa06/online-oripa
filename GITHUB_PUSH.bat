@@ -1,3 +1,4 @@
+
 @echo off
 cd /d "%~dp0"
 echo.
@@ -34,3 +35,11 @@ if errorlevel 1 (
 echo.
 echo Done! https://github.com/%GHUSER%/online-oripa
 pause
+
+
+
+
+
+
+
+

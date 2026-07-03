@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionProfile } from "@/lib/auth";
-import { formatYen, getStartOfTodayJST } from "@/lib/utils";
+import { formatPoints, getStartOfTodayJST } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { LoginBonusCard } from "@/components/mypage/LoginBonusCard";
 import { CouponRedeemForm } from "@/components/mypage/CouponRedeemForm";
@@ -36,8 +36,8 @@ export default async function MypagePage() {
       <p className="mt-1 text-muted">{profile.email}</p>
 
       <div className="card-surface mt-6 p-6">
-        <p className="text-sm text-muted">保有ポイント</p>
-        <p className="mt-1 text-3xl font-bold gold-text">{formatYen(profile.points)}</p>
+        <p className="text-sm text-muted">Pコイン枚数</p>
+        <p className="mt-1 text-3xl font-bold gold-text">{formatPoints(profile.points)}</p>
         <Link href="/points" className="btn-primary mt-4 inline-flex text-sm">
           ポイントを購入
         </Link>

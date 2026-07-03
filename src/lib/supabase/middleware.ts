@@ -10,6 +10,7 @@ const PUBLIC_PREFIXES = [
   "/register",
   "/forgot-password",
   "/auth",
+  "/api/auth",
   "/api/stripe/webhook",
   "/api/address",
 ];

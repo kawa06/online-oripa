@@ -45,7 +45,7 @@ export function CouponManager({ coupons }: { coupons: Coupon[] }) {
         <button type="submit" className="btn-primary" disabled={loading}>{loading ? "作成中..." : "作成"}</button>
       </form>
 
-      <div className="card-surface overflow-hidden">
+      <div className="card-surface table-scroll">
         <table className="w-full text-sm">
           <thead className="bg-bg-elevated text-left text-muted">
             <tr>

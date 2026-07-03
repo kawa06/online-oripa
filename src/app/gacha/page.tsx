@@ -1,6 +1,6 @@
 ﻿import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatYen } from "@/lib/utils";
+import { formatPoints } from "@/lib/utils";
 
 export default async function GachaListPage() {
   const gachas = await prisma.gacha
@@ -41,7 +41,7 @@ export default async function GachaListPage() {
                   <p className="mt-1 line-clamp-2 text-sm text-muted">{g.description}</p>
                 )}
                 <p className="mt-3 font-semibold text-gold">
-                  {formatYen(g.pricePerPull)} / 1回
+                  {formatPoints(g.pricePerPull)} / 1回
                 </p>
                 <p className="mt-1 text-xs text-muted">
                   残り {g.remainingSlots.toLocaleString()} / {g.totalSlots.toLocaleString()} 口
